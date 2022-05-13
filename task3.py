@@ -60,17 +60,67 @@ def solveSubProblem(board):
                 path.pop(-1)
         solution.append(list(reversed(path)))
     return solution
+#
+#
+#The Most Optimal way is to move one of the sides first then continue with the problem
+#
+#Moving the middle part first will block the final 2 peices infront of each other
+#
+def CombineChoose(board , SolutionWhite, SolutionBlack):
+    IndexW2H=1
+    Hole=[]
+    while len(SolutionBlack) + len(SolutionWhite) > 0:
+        for elements in range(len(SolutionBlack)):
+                if SolutionWhite[elements][len(SolutionWhite[elements])-1]==Hole:
+                    IndexW2H=elements
+        for j in range(len(SolutionWhite[IndexW2H])):
+            if board[SolutionWhite[IndexW2H][j][0]][SolutionWhite[IndexW2H][j][1]]=="b":
+                Holed=True
+                Hole=SolutionWhite[IndexW2H][0]
+                SolutionWhite[IndexW2H].pop(0)
+                SolutionWhite[IndexW2H].pop(0)
+                SolutionWhite.append(SolutionWhite[IndexW2H])
+                SolutionWhite.pop(IndexW2H)
+                break
+            if board[SolutionWhite[IndexW2H][j][0]][SolutionWhite[IndexW2H][j][1]]==".":
+                movePiece(board,SolutionWhite[IndexW2H][j-1],SolutionWhite[IndexW2H][j])
+        if Holed is False:
+            Hole=SolutionWhite[IndexW2H][0]
+            SolutionWhite.pop(IndexW2H)
+        Holed=False
+
+#################################^^^^^^^White^^^^^^^^####################################
+        if len(SolutionBlack) > 0:
+            for elements in range(len(SolutionBlack)):
+                    if SolutionBlack[elements][len(SolutionBlack[elements])-1]==Hole:
+                        IndexB2H=elements
+            for j in range(len(SolutionBlack[IndexB2H])):
+                if board[SolutionBlack[IndexB2H][j][0]][SolutionBlack[IndexB2H][j][1]]=="w":
+                    Last=(possibleMoves(board,SolutionWhite[0][0][0],SolutionWhite[0][0][1]))
+                    # choose where to place the white on the board
+                    for whitePossibility in Last:
+                        if whitePossibility not in SolutionBlack[IndexB2H]:
+                            # move the white away from black path
+                            movePiece(board, SolutionWhite[0][0], whitePossibility)
+                            # store the new position in white's solution
+                            SolutionWhite[0].insert(0, whitePossibility)
+                if board[SolutionBlack[IndexB2H][j][0]][SolutionBlack[IndexB2H][j][1]]==".":
+                    movePiece(board,SolutionBlack[IndexB2H][j-1],SolutionBlack[IndexB2H][j])
+            if Holed is False:
+                Hole=SolutionBlack[IndexB2H][0]
+                SolutionBlack.pop(IndexB2H)
+            Holed=False
 
 def main():
-    board = [["w", "w", "w"], [".", ".", "."], [".", ".", "."], ["b" ,"b" ,"b"]]
+    board = [["b", "b", "b"], [".", ".", "."], [".", ".", "."], ["w" ,"w" ,"w"]]
     blackBoard = board.copy()
-    blackBoard[0] = [".", ".", "."]
+    blackBoard[3] = [".", ".", "."]
     solutionBlack = solveSubProblem(blackBoard)
     whiteBoard = board.copy()
-    whiteBoard[3] = [".", ".", "."]
+    whiteBoard[0] = [".", ".", "."]
     solutionWhite = solveSubProblem(whiteBoard)
-    print(solutionWhite)
-    print(solutionBlack)
+    board2 = [["b", "b", "b"], [".", ".", "."], [".", ".", "."], ["w" ,"w" ,"w"]]
+    CombineChoose(board2,solutionWhite,solutionBlack)
     
 if __name__ == "__main__":
     main()
